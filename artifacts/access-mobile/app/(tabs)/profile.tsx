@@ -1,0 +1,177 @@
+import React from 'react';
+import {
+  View, Text, TouchableOpacity, StyleSheet,
+  Alert, Platform, ScrollView,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
+import colors from '@/constants/colors';
+
+const C = colors.light;
+
+export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
+  const { user, logout } = useAuth();
+  const qc = useQueryClient();
+  const topPad = insets.top + (Platform.OS === 'web' ? 16 : 4);
+  const bottomPad = insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80;
+
+  const handleLogout = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert('Sign Out', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out', style: 'destructive',
+        onPress: async () => { await logout(); qc.clear(); router.replace('/auth'); },
+      },
+    ]);
+  };
+
+  const joinDate = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : '—';
+
+  return (
+    <ScrollView
+      style={{ backgroundColor: C.background }}
+      contentContainerStyle={{ paddingTop: topPad, paddingHorizontal: 20, paddingBottom: bottomPad }}
+    >
+      <Text style={styles.screenTitle}>Profile</Text>
+
+      {/* Avatar */}
+      <View style={styles.avatarSection}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{user?.username?.[0]?.toUpperCase() ?? '?'}</Text>
+        </View>
+        <Text style={styles.username}>{user?.username}</Text>
+        <Text style={styles.joined}>Miner since {joinDate}</Text>
+      </View>
+
+      {/* Stats */}
+      <View style={styles.statsRow}>
+        <StatCard value={(user?.balance ?? 0).toFixed(4)} label="ZRN Balance" color={C.primary} />
+        <StatCard value={String(user?.referralCount ?? 0)} label="Referrals" color={C.accent} />
+        <StatCard value="0.01" label="Per Session" color={C.success} />
+      </View>
+
+      {/* Referral rates info */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Feather name="info" size={16} color={C.primary} />
+          <Text style={styles.cardTitle}>Earnings Breakdown</Text>
+        </View>
+        <RateRow label="Base mining per session" value="+0.0100 ZRN" />
+        <RateRow label="Per active referral (mining)" value="+0.0010 ZRN" />
+        <RateRow label="New referral signup bonus" value="+0.0100 ZRN" />
+        <RateRow label="Total supply" value="250,000 ZRN" highlight />
+      </View>
+
+      {/* Referral code */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Feather name="share-2" size={16} color={C.primary} />
+          <Text style={styles.cardTitle}>Your Referral Code</Text>
+        </View>
+        <View style={styles.referralBox}>
+          <Text style={styles.referralCode}>{user?.referralCode ?? '——'}</Text>
+        </View>
+        <Text style={styles.referralHint}>
+          Share this code — you earn +0.01 ZRN when someone signs up, and +0.001 ZRN bonus per session when they mine.
+        </Text>
+      </View>
+
+      {/* Info */}
+      <View style={styles.card}>
+        <InfoRow icon="user" label="Username" value={user?.username ?? '—'} />
+        <View style={styles.sep} />
+        <InfoRow icon="calendar" label="Member Since" value={joinDate} />
+        <View style={styles.sep} />
+        <InfoRow icon="users" label="Referral Count" value={String(user?.referralCount ?? 0)} />
+      </View>
+
+      <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
+        <Feather name="log-out" size={17} color={C.destructive} />
+        <Text style={styles.logoutText}>Sign Out</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+function StatCard({ value, label, color }: { value: string; label: string; color: string }) {
+  return (
+    <View style={styles.statCard}>
+      <Text style={[styles.statValue, { color }]}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function RateRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <View style={styles.rateRow}>
+      <Text style={styles.rateLabel}>{label}</Text>
+      <Text style={[styles.rateValue, highlight && { color: C.primary }]}>{value}</Text>
+    </View>
+  );
+}
+
+function InfoRow({ icon, label, value }: { icon: any; label: string; value: string }) {
+  return (
+    <View style={styles.infoRow}>
+      <Feather name={icon} size={15} color={C.mutedForeground} />
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  screenTitle: { fontSize: 24, fontFamily: 'Inter_700Bold', color: C.foreground, paddingBottom: 16 },
+  avatarSection: { alignItems: 'center', marginBottom: 20 },
+  avatar: {
+    width: 76, height: 76, borderRadius: 38,
+    backgroundColor: C.secondary, borderWidth: 2, borderColor: C.primary,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: C.primary, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4, shadowRadius: 14, elevation: 7, marginBottom: 10,
+  },
+  avatarText: { fontSize: 30, color: C.primary, fontFamily: 'Inter_700Bold' },
+  username: { fontSize: 20, color: C.foreground, fontFamily: 'Inter_700Bold' },
+  joined: { fontSize: 12, color: C.mutedForeground, fontFamily: 'Inter_400Regular', marginTop: 3 },
+  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
+  statCard: {
+    flex: 1, backgroundColor: C.card, borderRadius: 14,
+    borderWidth: 1, borderColor: C.border, padding: 12, alignItems: 'center',
+  },
+  statValue: { fontSize: 18, fontFamily: 'Inter_700Bold' },
+  statLabel: { fontSize: 10, color: C.mutedForeground, fontFamily: 'Inter_400Regular', marginTop: 3, textAlign: 'center' },
+  card: {
+    backgroundColor: C.card, borderRadius: 16,
+    borderWidth: 1, borderColor: C.border, padding: 16, marginBottom: 12,
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  cardTitle: { fontSize: 14, color: C.foreground, fontFamily: 'Inter_600SemiBold' },
+  rateRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
+  rateLabel: { fontSize: 13, color: C.mutedForeground, fontFamily: 'Inter_400Regular', flex: 1 },
+  rateValue: { fontSize: 13, color: C.foreground, fontFamily: 'Inter_600SemiBold' },
+  referralBox: {
+    backgroundColor: C.secondary, borderRadius: 10,
+    padding: 14, alignItems: 'center', marginBottom: 10,
+  },
+  referralCode: { fontSize: 22, color: C.primary, fontFamily: 'Inter_700Bold', letterSpacing: 5 },
+  referralHint: { fontSize: 12, color: C.mutedForeground, fontFamily: 'Inter_400Regular', lineHeight: 18 },
+  sep: { height: 1, backgroundColor: C.border, marginVertical: 10 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  infoLabel: { flex: 1, fontSize: 13, color: C.mutedForeground, fontFamily: 'Inter_400Regular' },
+  infoValue: { fontSize: 13, color: C.foreground, fontFamily: 'Inter_500Medium' },
+  logoutBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    backgroundColor: C.card, borderRadius: 14, borderWidth: 1,
+    borderColor: C.destructive + '40', padding: 15, marginTop: 4,
+  },
+  logoutText: { fontSize: 15, color: C.destructive, fontFamily: 'Inter_600SemiBold' },
+});

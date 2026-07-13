@@ -1,0 +1,23 @@
+kind = "mobile"
+previewPath = "/"
+title = "Access Mobile — Virtual Mining"
+version = "1.0.0"
+id = "artifacts/access-mobile"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/" ]
+localPort = 22099
+
+[services.development]
+run = "pnpm --filter @workspace/access-mobile run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/access-mobile", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/access-mobile", "run", "serve" ]
+
+[services.env]
+PORT = "22099"
+BASE_PATH = "/"

@@ -5,7 +5,8 @@
  * Access Mobile Virtual Mining API
  * OpenAPI spec version: 0.1.0
  */
+import type { Transaction } from './transaction';
 
-export interface HealthStatus {
-  status: string;
+export interface TransactionsResponse {
+  transactions: Transaction[];
 }

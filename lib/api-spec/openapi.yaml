@@ -1,22 +1,22 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Access Mobile Virtual Mining API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: mining
+  - name: leaderboard
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +24,300 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /mining/status:
+    get:
+      operationId: getMiningStatus
+      tags: [mining]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Mining status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MiningStatus"
+
+  /mining/start:
+    post:
+      operationId: startMining
+      tags: [mining]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Mining started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MiningStatus"
+        "400":
+          description: Already mining
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /mining/claim:
+    post:
+      operationId: claimMining
+      tags: [mining]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Tokens claimed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResponse"
+        "400":
+          description: No active session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
+
+  /transactions:
+    get:
+      operationId: getTransactions
+      tags: [mining]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionsResponse"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        referralCode:
+          type: string
+      required: [username, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required: [token, user]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        balance:
+          type: number
+        referralCode:
+          type: string
+        referralCount:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, username, balance, referralCode, referralCount, createdAt]
+
+    MiningStatus:
+      type: object
+      properties:
+        isActive:
+          type: boolean
+        startedAt:
+          type: string
+          nullable: true
+        earnedSoFar:
+          type: number
+        ratePerSession:
+          type: number
+        balance:
+          type: number
+        activeReferralCount:
+          type: integer
+        bonusPerSession:
+          type: number
+        totalMined:
+          type: number
+        totalSupply:
+          type: number
+      required: [isActive, startedAt, earnedSoFar, ratePerSession, balance, activeReferralCount, bonusPerSession, totalMined, totalSupply]
+
+    ClaimResponse:
+      type: object
+      properties:
+        earned:
+          type: number
+        newBalance:
+          type: number
+        activeReferralCount:
+          type: integer
+      required: [earned, newBalance, activeReferralCount]
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        username:
+          type: string
+        balance:
+          type: number
+      required: [rank, username, balance]
+
+    LeaderboardResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+        totalMined:
+          type: number
+        totalSupply:
+          type: number
+      required: [entries, totalMined, totalSupply]
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        type:
+          type: string
+        createdAt:
+          type: string
+      required: [id, amount, type, createdAt]
+
+    TransactionsResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+      required: [transactions]
