@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Access Mobile — Virtual Mining",
+    "name": "NEXORA — Mining Network",
     "slug": "access-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "access-mobile",
+    "scheme": "nexora",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#080C14"
     },
     "ios": {
       "supportsTablet": false

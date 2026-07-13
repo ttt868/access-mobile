@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  View, Text, FlatList, StyleSheet, ActivityIndicator, Platform,
+  View, Text, FlatList, StyleSheet, ActivityIndicator, Platform, Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -10,6 +10,17 @@ import colors from '@/constants/colors';
 
 const C = colors.light;
 const RANK_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
+
+function Avatar({ avatarUrl, username, size }: { avatarUrl?: string | null; username: string; size: number }) {
+  if (avatarUrl) {
+    return <Image source={{ uri: avatarUrl }} style={{ width: size, height: size, borderRadius: size / 2 }} />;
+  }
+  return (
+    <View style={[styles.avatarFallback, { width: size, height: size, borderRadius: size / 2 }]}>
+      <Text style={[styles.avatarFallbackText, { fontSize: size * 0.4 }]}>{username[0]?.toUpperCase()}</Text>
+    </View>
+  );
+}
 
 export default function LeaderboardScreen() {
   const insets = useSafeAreaInsets();
@@ -24,7 +35,7 @@ export default function LeaderboardScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topPad }]}>
-      <Text style={styles.screenTitle}>Top Miners</Text>
+      <Text style={styles.screenTitle}>Leaderboard</Text>
 
       {/* Supply bar */}
       <View style={styles.supplyBar}>
@@ -63,9 +74,7 @@ export default function LeaderboardScreen() {
             return (
               <View style={[styles.row, isMe && styles.rowMe]}>
                 <Text style={styles.rankNum}>#{item.rank}</Text>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{item.username[0].toUpperCase()}</Text>
-                </View>
+                <Avatar avatarUrl={item.avatarUrl} username={item.username} size={34} />
                 <Text style={[styles.name, isMe && { color: C.primary }]} numberOfLines={1}>{item.username}</Text>
                 {isMe && <View style={styles.meBadge}><Text style={styles.meBadgeText}>YOU</Text></View>}
                 <Text style={styles.balance}>{item.balance.toFixed(4)} ZRN</Text>
@@ -81,11 +90,12 @@ export default function LeaderboardScreen() {
 
 function PodiumItem({ entry, colorIdx, size }: { entry: any; colorIdx: number; size: 'sm' | 'lg' }) {
   const isLg = size === 'lg';
+  const avatarSize = isLg ? 60 : 46;
   return (
     <View style={[styles.podiumItem, isLg && { paddingBottom: 8 }]}>
       {isLg && <Feather name="award" size={18} color={RANK_COLORS[0]} style={{ marginBottom: 4 }} />}
-      <View style={[styles.podiumAvatar, { borderColor: RANK_COLORS[colorIdx], width: isLg ? 60 : 46, height: isLg ? 60 : 46, borderRadius: isLg ? 30 : 23 }]}>
-        <Text style={[styles.podiumAvatarText, { fontSize: isLg ? 22 : 16 }]}>{entry.username[0].toUpperCase()}</Text>
+      <View style={[styles.podiumAvatarRing, { borderColor: RANK_COLORS[colorIdx], width: avatarSize + 6, height: avatarSize + 6, borderRadius: (avatarSize + 6) / 2 }]}>
+        <Avatar avatarUrl={entry.avatarUrl} username={entry.username} size={avatarSize} />
       </View>
       <Text style={[styles.podiumRank, { color: RANK_COLORS[colorIdx] }]}>#{entry.rank}</Text>
       <Text style={styles.podiumName} numberOfLines={1}>{entry.username}</Text>
@@ -112,23 +122,20 @@ const styles = StyleSheet.create({
     backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.border, padding: 16,
   },
   podiumItem: { alignItems: 'center', flex: 1, gap: 4 },
-  podiumAvatar: {
-    backgroundColor: C.secondary, borderWidth: 2, borderColor: C.mutedForeground,
+  podiumAvatarRing: {
+    borderWidth: 2, alignItems: 'center', justifyContent: 'center',
+  },
+  avatarFallback: {
+    backgroundColor: C.secondary, borderWidth: 1, borderColor: C.mutedForeground,
     alignItems: 'center', justifyContent: 'center',
   },
-  podiumAvatarText: { color: C.foreground, fontFamily: 'Inter_700Bold' },
+  avatarFallbackText: { color: C.foreground, fontFamily: 'Inter_700Bold' },
   podiumRank: { fontSize: 12, fontFamily: 'Inter_700Bold', color: C.mutedForeground },
   podiumName: { fontSize: 11, color: C.foreground, fontFamily: 'Inter_500Medium', maxWidth: 80 },
   podiumBal: { fontSize: 11, color: C.mutedForeground, fontFamily: 'Inter_400Regular' },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 10 },
   rowMe: { backgroundColor: '#0A1A1F', borderRadius: 10, paddingHorizontal: 8 },
   rankNum: { width: 30, fontSize: 13, color: C.mutedForeground, fontFamily: 'Inter_500Medium' },
-  avatar: {
-    width: 34, height: 34, borderRadius: 17,
-    backgroundColor: C.secondary, borderWidth: 1, borderColor: C.border,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { fontSize: 13, color: C.foreground, fontFamily: 'Inter_600SemiBold' },
   name: { flex: 1, fontSize: 14, color: C.foreground, fontFamily: 'Inter_500Medium' },
   meBadge: { backgroundColor: C.primary + '22', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   meBadgeText: { fontSize: 10, color: C.primary, fontFamily: 'Inter_700Bold' },

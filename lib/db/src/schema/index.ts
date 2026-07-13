@@ -9,6 +9,7 @@ export const usersTable = pgTable("users", {
   referralCode: text("referral_code").notNull().unique(),
   referralCount: integer("referral_count").notNull().default(0),
   referredById: integer("referred_by_id").references((): any => usersTable.id),
+  avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

@@ -1,2 +1,4 @@
 - [Importing an external same-template repo](importing-external-repo.md) — clone, diff scaffold vs fetched file-by-file, only copy what differs.
 - [Orval mutation hooks with no request body](orval-empty-body-mutations.md) — call `.mutate()` with no args, not `.mutate({})`.
+- [react-native Alert.alert is a no-op on web](expo-web-alert-noop.md) — confirm dialogs need a `Platform.OS==='web'` branch using `window.confirm`.
+- [Server-authoritative timers](server-authoritative-timers.md) — timed unlocks (mining, cooldowns) must be gated by a server timestamp comparison, never client elapsed-time math.

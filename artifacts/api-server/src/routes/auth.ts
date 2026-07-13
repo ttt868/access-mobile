@@ -20,9 +20,12 @@ function userResponse(user: typeof usersTable.$inferSelect) {
     balance: parseFloat(user.balance),
     referralCode: user.referralCode,
     referralCount: user.referralCount,
+    avatarUrl: user.avatarUrl ?? null,
     createdAt: user.createdAt.toISOString(),
   };
 }
+
+const MAX_AVATAR_BYTES = 400_000; // ~400KB decoded, keeps rows small
 
 router.post("/register", async (req, res) => {
   const { username, password, referralCode } = req.body as {
@@ -116,6 +119,29 @@ router.post("/login", async (req, res) => {
     return;
   }
   res.json({ token: createToken(user.id), user: userResponse(user) });
+});
+
+router.patch("/me/avatar", requireAuth, async (req: AuthRequest, res) => {
+  const { avatarBase64 } = req.body as { avatarBase64?: string };
+  if (!avatarBase64 || !avatarBase64.startsWith("data:image/")) {
+    res.status(400).json({ error: "avatarBase64 must be a data:image/* URI" });
+    return;
+  }
+
+  const base64Part = avatarBase64.split(",")[1] ?? "";
+  const approxBytes = Math.floor((base64Part.length * 3) / 4);
+  if (approxBytes > MAX_AVATAR_BYTES || approxBytes === 0) {
+    res.status(400).json({ error: "Image too large. Please choose a smaller photo." });
+    return;
+  }
+
+  const [user] = await db
+    .update(usersTable)
+    .set({ avatarUrl: avatarBase64 })
+    .where(eq(usersTable.id, req.userId!))
+    .returning();
+
+  res.json(userResponse(user));
 });
 
 router.get("/me", requireAuth, async (req: AuthRequest, res) => {

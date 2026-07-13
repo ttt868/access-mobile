@@ -6,12 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface User {
+export interface ReferralEntry {
   id: number;
   username: string;
-  balance: number;
-  referralCode: string;
-  referralCount: number;
   avatarUrl?: string | null;
-  createdAt: string;
+  balance: number;
+  isActive: boolean;
+  joinedAt: string;
 }

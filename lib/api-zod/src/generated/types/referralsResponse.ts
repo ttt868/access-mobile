@@ -5,13 +5,10 @@
  * Access Mobile Virtual Mining API
  * OpenAPI spec version: 0.1.0
  */
+import type { ReferralEntry } from './referralEntry';
 
-export interface User {
-  id: number;
-  username: string;
-  balance: number;
+export interface ReferralsResponse {
+  referrals: ReferralEntry[];
+  totalCount: number;
   referralCode: string;
-  referralCount: number;
-  avatarUrl?: string | null;
-  createdAt: string;
 }

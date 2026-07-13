@@ -30,6 +30,7 @@ export const RegisterResponse = zod.object({
   "balance": zod.number(),
   "referralCode": zod.string(),
   "referralCount": zod.number(),
+  "avatarUrl": zod.string().nullish(),
   "createdAt": zod.string()
 })
 })
@@ -48,6 +49,7 @@ export const LoginResponse = zod.object({
   "balance": zod.number(),
   "referralCode": zod.string(),
   "referralCount": zod.number(),
+  "avatarUrl": zod.string().nullish(),
   "createdAt": zod.string()
 })
 })
@@ -59,6 +61,7 @@ export const GetMeResponse = zod.object({
   "balance": zod.number(),
   "referralCode": zod.string(),
   "referralCount": zod.number(),
+  "avatarUrl": zod.string().nullish(),
   "createdAt": zod.string()
 })
 
@@ -66,7 +69,11 @@ export const GetMeResponse = zod.object({
 export const GetMiningStatusResponse = zod.object({
   "isActive": zod.boolean(),
   "startedAt": zod.string().nullable(),
-  "earnedSoFar": zod.number(),
+  "serverNow": zod.string().describe('Current server time, used by the client to keep the countdown in sync and immune to local clock changes.'),
+  "sessionDurationMs": zod.number().describe('Total duration of a mining session in milliseconds (12 hours).'),
+  "remainingMs": zod.number().describe('Milliseconds remaining until the active session can be claimed. 0 when no session is active or it is ready.'),
+  "isClaimable": zod.boolean().describe('True once the active session has run its full duration and can be claimed.'),
+  "earnedSoFar": zod.number().describe('Projected (not yet credited) amount accrued so far in the active session, for display only.'),
   "ratePerSession": zod.number(),
   "balance": zod.number(),
   "activeReferralCount": zod.number(),
@@ -79,7 +86,11 @@ export const GetMiningStatusResponse = zod.object({
 export const StartMiningResponse = zod.object({
   "isActive": zod.boolean(),
   "startedAt": zod.string().nullable(),
-  "earnedSoFar": zod.number(),
+  "serverNow": zod.string().describe('Current server time, used by the client to keep the countdown in sync and immune to local clock changes.'),
+  "sessionDurationMs": zod.number().describe('Total duration of a mining session in milliseconds (12 hours).'),
+  "remainingMs": zod.number().describe('Milliseconds remaining until the active session can be claimed. 0 when no session is active or it is ready.'),
+  "isClaimable": zod.boolean().describe('True once the active session has run its full duration and can be claimed.'),
+  "earnedSoFar": zod.number().describe('Projected (not yet credited) amount accrued so far in the active session, for display only.'),
   "ratePerSession": zod.number(),
   "balance": zod.number(),
   "activeReferralCount": zod.number(),
@@ -96,11 +107,41 @@ export const ClaimMiningResponse = zod.object({
 })
 
 
+export const UpdateAvatarBody = zod.object({
+  "avatarBase64": zod.string().describe('Data URI (e.g. data:image\/jpeg;base64,...) of the new avatar image.')
+})
+
+export const UpdateAvatarResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "balance": zod.number(),
+  "referralCode": zod.string(),
+  "referralCount": zod.number(),
+  "avatarUrl": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+export const GetReferralsResponse = zod.object({
+  "referrals": zod.array(zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "avatarUrl": zod.string().nullish(),
+  "balance": zod.number(),
+  "isActive": zod.boolean(),
+  "joinedAt": zod.string()
+})),
+  "totalCount": zod.number(),
+  "referralCode": zod.string()
+})
+
+
 export const GetLeaderboardResponse = zod.object({
   "entries": zod.array(zod.object({
   "rank": zod.number(),
   "username": zod.string(),
-  "balance": zod.number()
+  "balance": zod.number(),
+  "avatarUrl": zod.string().nullish()
 })),
   "totalMined": zod.number(),
   "totalSupply": zod.number()

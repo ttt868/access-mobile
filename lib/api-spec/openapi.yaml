@@ -11,6 +11,7 @@ tags:
   - name: auth
   - name: mining
   - name: leaderboard
+  - name: referrals
 paths:
   /healthz:
     get:
@@ -147,6 +148,46 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /auth/me/avatar:
+    patch:
+      operationId: updateAvatar
+      tags: [auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAvatarRequest"
+      responses:
+        "200":
+          description: Avatar updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /referrals:
+    get:
+      operationId: getReferrals
+      tags: [referrals]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Your referrals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralsResponse"
+
   /leaderboard:
     get:
       operationId: getLeaderboard
@@ -237,9 +278,20 @@ components:
           type: string
         referralCount:
           type: integer
+        avatarUrl:
+          type: string
+          nullable: true
         createdAt:
           type: string
       required: [id, username, balance, referralCode, referralCount, createdAt]
+
+    UpdateAvatarRequest:
+      type: object
+      properties:
+        avatarBase64:
+          type: string
+          description: Data URI (e.g. data:image/jpeg;base64,...) of the new avatar image.
+      required: [avatarBase64]
 
     MiningStatus:
       type: object
@@ -249,8 +301,21 @@ components:
         startedAt:
           type: string
           nullable: true
+        serverNow:
+          type: string
+          description: Current server time, used by the client to keep the countdown in sync and immune to local clock changes.
+        sessionDurationMs:
+          type: number
+          description: Total duration of a mining session in milliseconds (12 hours).
+        remainingMs:
+          type: number
+          description: Milliseconds remaining until the active session can be claimed. 0 when no session is active or it is ready.
+        isClaimable:
+          type: boolean
+          description: True once the active session has run its full duration and can be claimed.
         earnedSoFar:
           type: number
+          description: Projected (not yet credited) amount accrued so far in the active session, for display only.
         ratePerSession:
           type: number
         balance:
@@ -263,7 +328,7 @@ components:
           type: number
         totalSupply:
           type: number
-      required: [isActive, startedAt, earnedSoFar, ratePerSession, balance, activeReferralCount, bonusPerSession, totalMined, totalSupply]
+      required: [isActive, startedAt, serverNow, sessionDurationMs, remainingMs, isClaimable, earnedSoFar, ratePerSession, balance, activeReferralCount, bonusPerSession, totalMined, totalSupply]
 
     ClaimResponse:
       type: object
@@ -285,6 +350,9 @@ components:
           type: string
         balance:
           type: number
+        avatarUrl:
+          type: string
+          nullable: true
       required: [rank, username, balance]
 
     LeaderboardResponse:
@@ -299,6 +367,37 @@ components:
         totalSupply:
           type: number
       required: [entries, totalMined, totalSupply]
+
+    ReferralEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        balance:
+          type: number
+        isActive:
+          type: boolean
+        joinedAt:
+          type: string
+      required: [id, username, balance, isActive, joinedAt]
+
+    ReferralsResponse:
+      type: object
+      properties:
+        referrals:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReferralEntry"
+        totalCount:
+          type: integer
+        referralCode:
+          type: string
+      required: [referrals, totalCount, referralCode]
 
     Transaction:
       type: object

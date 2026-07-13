@@ -1,34 +1,84 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  Alert, Platform, ScrollView,
+  Platform, ScrollView, Image, ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUpdateAvatar } from '@workspace/api-client-react';
 import { useAuth } from '@/context/AuthContext';
 import colors from '@/constants/colors';
 
 const C = colors.light;
 
+function confirm(title: string, message: string, onConfirm: () => void) {
+  // React Native's Alert.alert() is a silent no-op on web (react-native-web has
+  // no native dialog host), so its buttons never fire there. Route through the
+  // platform's real confirm dialog on web and Alert everywhere else.
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && window.confirm(`${title}\n\n${message}`)) {
+      onConfirm();
+    }
+    return;
+  }
+  const { Alert } = require('react-native');
+  Alert.alert(title, message, [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Sign Out', style: 'destructive', onPress: onConfirm },
+  ]);
+}
+
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const qc = useQueryClient();
+  const [avatarError, setAvatarError] = useState('');
   const topPad = insets.top + (Platform.OS === 'web' ? 16 : 4);
   const bottomPad = insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80;
 
+  const avatarMutation = useUpdateAvatar({
+    mutation: {
+      onSuccess: async (updated) => {
+        await updateUser(updated);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      },
+      onError: (e: any) => {
+        setAvatarError(e?.response?.data?.error ?? 'Could not update photo');
+      },
+    },
+  });
+
   const handleLogout = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert('Sign Out', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign Out', style: 'destructive',
-        onPress: async () => { await logout(); qc.clear(); router.replace('/auth'); },
-      },
-    ]);
+    confirm('Sign Out', 'Are you sure?', async () => {
+      await logout();
+      qc.clear();
+      router.replace('/auth');
+    });
+  };
+
+  const handlePickAvatar = async () => {
+    setAvatarError('');
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      setAvatarError('Photo library permission is required');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.4,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.[0]?.base64) return;
+    const asset = result.assets[0];
+    const mime = asset.mimeType ?? 'image/jpeg';
+    avatarMutation.mutate({ data: { avatarBase64: `data:${mime};base64,${asset.base64}` } });
   };
 
   const joinDate = user?.createdAt
@@ -40,15 +90,27 @@ export default function ProfileScreen() {
       style={{ backgroundColor: C.background }}
       contentContainerStyle={{ paddingTop: topPad, paddingHorizontal: 20, paddingBottom: bottomPad }}
     >
-      <Text style={styles.screenTitle}>Profile</Text>
+      <Text style={styles.screenTitle}>Account</Text>
 
       {/* Avatar */}
       <View style={styles.avatarSection}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{user?.username?.[0]?.toUpperCase() ?? '?'}</Text>
-        </View>
+        <TouchableOpacity onPress={handlePickAvatar} activeOpacity={0.8} disabled={avatarMutation.isPending}>
+          <View style={styles.avatar}>
+            {avatarMutation.isPending ? (
+              <ActivityIndicator color={C.primary} />
+            ) : user?.avatarUrl ? (
+              <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
+            ) : (
+              <Text style={styles.avatarText}>{user?.username?.[0]?.toUpperCase() ?? '?'}</Text>
+            )}
+          </View>
+          <View style={styles.avatarEditBadge}>
+            <Feather name="camera" size={13} color={C.primaryForeground} />
+          </View>
+        </TouchableOpacity>
         <Text style={styles.username}>{user?.username}</Text>
         <Text style={styles.joined}>Miner since {joinDate}</Text>
+        {!!avatarError && <Text style={styles.avatarError}>{avatarError}</Text>}
       </View>
 
       {/* Stats */}
@@ -64,7 +126,7 @@ export default function ProfileScreen() {
           <Feather name="info" size={16} color={C.primary} />
           <Text style={styles.cardTitle}>Earnings Breakdown</Text>
         </View>
-        <RateRow label="Base mining per session" value="+0.0100 ZRN" />
+        <RateRow label="Base mining per 12h session" value="+0.0100 ZRN" />
         <RateRow label="Per active referral (mining)" value="+0.0010 ZRN" />
         <RateRow label="New referral signup bonus" value="+0.0100 ZRN" />
         <RateRow label="Total supply" value="250,000 ZRN" highlight />
@@ -135,11 +197,18 @@ const styles = StyleSheet.create({
   avatar: {
     width: 76, height: 76, borderRadius: 38,
     backgroundColor: C.secondary, borderWidth: 2, borderColor: C.primary,
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
     shadowColor: C.primary, shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4, shadowRadius: 14, elevation: 7, marginBottom: 10,
   },
+  avatarImage: { width: '100%', height: '100%' },
+  avatarEditBadge: {
+    position: 'absolute', right: -2, bottom: 8, width: 24, height: 24, borderRadius: 12,
+    backgroundColor: C.primary, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: C.background,
+  },
   avatarText: { fontSize: 30, color: C.primary, fontFamily: 'Inter_700Bold' },
+  avatarError: { fontSize: 12, color: C.destructive, fontFamily: 'Inter_400Regular', marginTop: 6, textAlign: 'center' },
   username: { fontSize: 20, color: C.foreground, fontFamily: 'Inter_700Bold' },
   joined: { fontSize: 12, color: C.mutedForeground, fontFamily: 'Inter_400Regular', marginTop: 3 },
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },

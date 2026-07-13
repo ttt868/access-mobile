@@ -27,8 +27,10 @@ import type {
   LeaderboardResponse,
   LoginRequest,
   MiningStatus,
+  ReferralsResponse,
   RegisterRequest,
   TransactionsResponse,
+  UpdateAvatarRequest,
   User
 } from './api.schemas';
 
@@ -537,6 +539,142 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getClaimMiningMutationOptions(options));
     }
+
+export const getUpdateAvatarUrl = () => {
+
+
+
+
+  return `/api/auth/me/avatar`
+}
+
+export const updateAvatar = async (updateAvatarRequest: UpdateAvatarRequest, options?: RequestInit): Promise<User> => {
+
+  return customFetch<User>(getUpdateAvatarUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateAvatarRequest)
+  }
+);}
+
+
+
+
+
+export const getUpdateAvatarMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAvatar>>, TError,{data: BodyType<UpdateAvatarRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAvatar>>, TError,{data: BodyType<UpdateAvatarRequest>}, TContext> => {
+
+const mutationKey = ['updateAvatar'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAvatar>>, {data: BodyType<UpdateAvatarRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateAvatar(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAvatarMutationResult = NonNullable<Awaited<ReturnType<typeof updateAvatar>>>
+    export type UpdateAvatarMutationBody = BodyType<UpdateAvatarRequest>
+    export type UpdateAvatarMutationError = ErrorType<ErrorResponse>
+
+    export const useUpdateAvatar = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAvatar>>, TError,{data: BodyType<UpdateAvatarRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAvatar>>,
+        TError,
+        {data: BodyType<UpdateAvatarRequest>},
+        TContext
+      > => {
+      return useMutation(getUpdateAvatarMutationOptions(options));
+    }
+
+export const getGetReferralsUrl = () => {
+
+
+
+
+  return `/api/referrals`
+}
+
+export const getReferrals = async ( options?: RequestInit): Promise<ReferralsResponse> => {
+
+  return customFetch<ReferralsResponse>(getGetReferralsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetReferralsQueryKey = () => {
+    return [
+    `/api/referrals`
+    ] as const;
+    }
+
+
+export const getGetReferralsQueryOptions = <TData = Awaited<ReturnType<typeof getReferrals>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReferrals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReferralsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReferrals>>> = ({ signal }) => getReferrals({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReferrals>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetReferralsQueryResult = NonNullable<Awaited<ReturnType<typeof getReferrals>>>
+export type GetReferralsQueryError = ErrorType<unknown>
+
+
+
+export function useGetReferrals<TData = Awaited<ReturnType<typeof getReferrals>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReferrals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetReferralsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetLeaderboardUrl = () => {
 

@@ -5,9 +5,10 @@ import { requireAuth, type AuthRequest } from "../lib/auth.js";
 
 const router = Router();
 
-const MINING_BASE = 0.01;          // per session base
-const ACTIVE_REFERRAL_BONUS = 0.001; // per active referral per session
+const MINING_BASE = 0.01;              // base reward for a completed session
+const ACTIVE_REFERRAL_BONUS = 0.001;   // per active referral, added to a completed session
 const TOTAL_SUPPLY = 250000;
+const SESSION_DURATION_MS = 12 * 60 * 60 * 1000; // 12 hours — enforced server-side only
 
 async function getTotalMined(): Promise<number> {
   const result = await db.select({ total: sum(usersTable.balance) }).from(usersTable);
@@ -35,6 +36,14 @@ async function getActiveReferralCount(userId: number): Promise<number> {
   return count;
 }
 
+function sessionProgress(startedAt: Date, now: Date) {
+  const elapsedMs = Math.max(0, now.getTime() - startedAt.getTime());
+  const remainingMs = Math.max(0, SESSION_DURATION_MS - elapsedMs);
+  const isClaimable = remainingMs <= 0;
+  const progress = Math.min(1, elapsedMs / SESSION_DURATION_MS);
+  return { remainingMs, isClaimable, progress };
+}
+
 router.get("/status", requireAuth, async (req: AuthRequest, res) => {
   const userId = req.userId!;
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1);
@@ -53,11 +62,20 @@ router.get("/status", requireAuth, async (req: AuthRequest, res) => {
 
   const bonusPerSession = activeReferralCount * ACTIVE_REFERRAL_BONUS;
   const ratePerSession = MINING_BASE + bonusPerSession;
+  const now = new Date();
+
+  const { remainingMs, isClaimable, progress } = session
+    ? sessionProgress(session.startedAt, now)
+    : { remainingMs: 0, isClaimable: false, progress: 0 };
 
   res.json({
     isActive: !!session,
     startedAt: session?.startedAt.toISOString() ?? null,
-    earnedSoFar: 0,
+    serverNow: now.toISOString(),
+    sessionDurationMs: SESSION_DURATION_MS,
+    remainingMs,
+    isClaimable,
+    earnedSoFar: session ? Math.round(ratePerSession * progress * 1000000) / 1000000 : 0,
     ratePerSession,
     balance: parseFloat(user.balance),
     activeReferralCount,
@@ -80,7 +98,7 @@ router.post("/start", requireAuth, async (req: AuthRequest, res) => {
     return;
   }
 
-  await db.insert(miningSessionsTable).values({ userId });
+  const [session] = await db.insert(miningSessionsTable).values({ userId }).returning();
 
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1);
   const [activeReferralCount, totalMined] = await Promise.all([
@@ -89,9 +107,14 @@ router.post("/start", requireAuth, async (req: AuthRequest, res) => {
   ]);
 
   const bonusPerSession = activeReferralCount * ACTIVE_REFERRAL_BONUS;
+  const now = new Date();
   res.json({
     isActive: true,
-    startedAt: new Date().toISOString(),
+    startedAt: session.startedAt.toISOString(),
+    serverNow: now.toISOString(),
+    sessionDurationMs: SESSION_DURATION_MS,
+    remainingMs: SESSION_DURATION_MS,
+    isClaimable: false,
     earnedSoFar: 0,
     ratePerSession: MINING_BASE + bonusPerSession,
     balance: parseFloat(user.balance),
@@ -112,6 +135,12 @@ router.post("/claim", requireAuth, async (req: AuthRequest, res) => {
 
   if (!session) {
     res.status(400).json({ error: "No active mining session" });
+    return;
+  }
+
+  const { isClaimable } = sessionProgress(session.startedAt, new Date());
+  if (!isClaimable) {
+    res.status(400).json({ error: "Mining session is not finished yet" });
     return;
   }
 

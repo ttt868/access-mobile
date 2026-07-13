@@ -9,6 +9,15 @@
 export interface MiningStatus {
   isActive: boolean;
   startedAt: string | null;
+  /** Current server time, used by the client to keep the countdown in sync and immune to local clock changes. */
+  serverNow: string;
+  /** Total duration of a mining session in milliseconds (12 hours). */
+  sessionDurationMs: number;
+  /** Milliseconds remaining until the active session can be claimed. 0 when no session is active or it is ready. */
+  remainingMs: number;
+  /** True once the active session has run its full duration and can be claimed. */
+  isClaimable: boolean;
+  /** Projected (not yet credited) amount accrued so far in the active session, for display only. */
   earnedSoFar: number;
   ratePerSession: number;
   balance: number;

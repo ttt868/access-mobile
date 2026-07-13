@@ -7,7 +7,12 @@ const TOTAL_SUPPLY = 250000;
 
 router.get("/", async (_req, res) => {
   const [users, totalResult] = await Promise.all([
-    db.select({ id: usersTable.id, username: usersTable.username, balance: usersTable.balance })
+    db.select({
+      id: usersTable.id,
+      username: usersTable.username,
+      balance: usersTable.balance,
+      avatarUrl: usersTable.avatarUrl,
+    })
       .from(usersTable)
       .orderBy(desc(usersTable.balance))
       .limit(50),
@@ -21,6 +26,7 @@ router.get("/", async (_req, res) => {
       rank: i + 1,
       username: u.username,
       balance: parseFloat(u.balance),
+      avatarUrl: u.avatarUrl ?? null,
     })),
     totalMined: Math.round(totalMined * 1000000) / 1000000,
     totalSupply: TOTAL_SUPPLY,

@@ -19,13 +19,17 @@ function NativeTabLayout() {
         <Icon sf={{ default: 'wallet.pass', selected: 'wallet.pass.fill' }} />
         <Label>Wallet</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="referrals">
+        <Icon sf={{ default: 'person.2', selected: 'person.2.fill' }} />
+        <Label>Referrals</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="leaderboard">
         <Icon sf={{ default: 'trophy', selected: 'trophy.fill' }} />
         <Label>Ranks</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: 'person.circle', selected: 'person.circle.fill' }} />
-        <Label>Profile</Label>
+        <Label>Account</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
@@ -89,6 +93,18 @@ function ClassicTabLayout() {
         }}
       />
       <Tabs.Screen
+        name="referrals"
+        options={{
+          title: 'Referrals',
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="person.2.fill" tintColor={color} size={22} />
+            ) : (
+              <Feather name="users" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
         name="leaderboard"
         options={{
           title: 'Ranks',
@@ -103,7 +119,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: 'Account',
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="person.circle.fill" tintColor={color} size={22} />

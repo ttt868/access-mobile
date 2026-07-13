@@ -6,9 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  balance: number;
-  avatarUrl?: string | null;
+export interface UpdateAvatarRequest {
+  /** Data URI (e.g. data:image/jpeg;base64,...) of the new avatar image. */
+  avatarBase64: string;
 }

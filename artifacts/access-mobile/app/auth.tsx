@@ -12,6 +12,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { useRegister, useLogin } from '@workspace/api-client-react';
 import { useAuth } from '@/context/AuthContext';
 import colors from '@/constants/colors';
@@ -81,11 +83,16 @@ export default function AuthScreen() {
     <View style={[styles.container, { paddingTop: topPad }]}>
       {/* Logo */}
       <View style={styles.logoArea}>
-        <View style={styles.logoCircle}>
-          <Text style={styles.logoIcon}>⬡</Text>
-        </View>
-        <Text style={styles.appName}>ACCESS</Text>
-        <Text style={styles.tagline}>Virtual Mining Network</Text>
+        <LinearGradient
+          colors={[C.primary, C.accent]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.logoCircle}
+        >
+          <Feather name="cpu" size={30} color="#080C14" />
+        </LinearGradient>
+        <Text style={styles.appName}>NEXORA</Text>
+        <Text style={styles.tagline}>Global Mining Network</Text>
         <View style={styles.currencyBadge}>
           <Text style={styles.currencyBadgeText}>ZRN Token</Text>
         </View>
@@ -124,16 +131,23 @@ export default function AuthScreen() {
           {!!error && <Text style={styles.error}>{error}</Text>}
 
           <TouchableOpacity
-            style={[styles.btn, isLoading && styles.btnDisabled]}
+            style={styles.btnWrapper}
             onPress={handleSubmit}
             disabled={isLoading}
-            activeOpacity={0.8}
+            activeOpacity={0.85}
           >
-            {isLoading ? (
-              <ActivityIndicator color={C.primaryForeground} />
-            ) : (
-              <Text style={styles.btnText}>{mode === 'login' ? 'Sign In' : 'Start Mining'}</Text>
-            )}
+            <LinearGradient
+              colors={isLoading ? [C.secondary, C.secondary] : [C.primary, C.accent]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.btn}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={C.primaryForeground} />
+              ) : (
+                <Text style={styles.btnText}>{mode === 'login' ? 'Sign In' : 'Start Mining'}</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -168,17 +182,15 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   logoArea: { alignItems: 'center', paddingBottom: 24, paddingHorizontal: 24 },
   logoCircle: {
-    width: 72, height: 72, borderRadius: 18,
-    backgroundColor: C.secondary, borderWidth: 2, borderColor: C.primary,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+    width: 76, height: 76, borderRadius: 22,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 14,
     shadowColor: C.primary, shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6, shadowRadius: 18, elevation: 10,
+    shadowOpacity: 0.6, shadowRadius: 20, elevation: 10,
   },
-  logoIcon: { fontSize: 36, color: C.primary },
-  appName: { fontSize: 26, fontFamily: 'Inter_700Bold', color: C.foreground, letterSpacing: 6 },
-  tagline: { fontSize: 12, fontFamily: 'Inter_400Regular', color: C.mutedForeground, marginTop: 2, letterSpacing: 1 },
+  appName: { fontSize: 28, fontFamily: 'Inter_700Bold', color: C.foreground, letterSpacing: 5 },
+  tagline: { fontSize: 12, fontFamily: 'Inter_400Regular', color: C.mutedForeground, marginTop: 3, letterSpacing: 1 },
   currencyBadge: {
-    marginTop: 10, backgroundColor: C.primary + '22',
+    marginTop: 12, backgroundColor: C.primary + '22',
     borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5,
     borderWidth: 1, borderColor: C.primary + '44',
   },
@@ -201,12 +213,11 @@ const styles = StyleSheet.create({
     fontSize: 15, fontFamily: 'Inter_400Regular', color: C.foreground,
   },
   error: { fontSize: 13, color: C.destructive, fontFamily: 'Inter_400Regular', textAlign: 'center' },
-  btn: {
-    backgroundColor: C.primary, borderRadius: 14, paddingVertical: 15,
-    alignItems: 'center', marginTop: 6,
+  btnWrapper: {
+    borderRadius: 14, marginTop: 6,
     shadowColor: C.primary, shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4, shadowRadius: 12, elevation: 8,
   },
-  btnDisabled: { opacity: 0.6 },
+  btn: { borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
   btnText: { fontSize: 16, fontFamily: 'Inter_700Bold', color: C.primaryForeground, letterSpacing: 0.5 },
 });
