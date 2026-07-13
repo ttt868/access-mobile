@@ -11,32 +11,17 @@ import { router } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateAvatar } from '@workspace/api-client-react';
 import { useAuth } from '@/context/AuthContext';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import colors from '@/constants/colors';
 
 const C = colors.light;
-
-function confirm(title: string, message: string, onConfirm: () => void) {
-  // React Native's Alert.alert() is a silent no-op on web (react-native-web has
-  // no native dialog host), so its buttons never fire there. Route through the
-  // platform's real confirm dialog on web and Alert everywhere else.
-  if (Platform.OS === 'web') {
-    if (typeof window !== 'undefined' && window.confirm(`${title}\n\n${message}`)) {
-      onConfirm();
-    }
-    return;
-  }
-  const { Alert } = require('react-native');
-  Alert.alert(title, message, [
-    { text: 'Cancel', style: 'cancel' },
-    { text: 'Sign Out', style: 'destructive', onPress: onConfirm },
-  ]);
-}
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout, updateUser } = useAuth();
   const qc = useQueryClient();
   const [avatarError, setAvatarError] = useState('');
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const topPad = insets.top + (Platform.OS === 'web' ? 16 : 4);
   const bottomPad = insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80;
 
@@ -54,11 +39,14 @@ export default function ProfileScreen() {
 
   const handleLogout = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    confirm('Sign Out', 'Are you sure?', async () => {
-      await logout();
-      qc.clear();
-      router.replace('/auth');
-    });
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
+    await logout();
+    qc.clear();
+    router.replace('/auth');
   };
 
   const handlePickAvatar = async () => {
@@ -159,6 +147,18 @@ export default function ProfileScreen() {
         <Feather name="log-out" size={17} color={C.destructive} />
         <Text style={styles.logoutText}>Sign Out</Text>
       </TouchableOpacity>
+
+      <ConfirmModal
+        visible={logoutModalVisible}
+        icon="log-out"
+        title="Sign Out"
+        message="Are you sure you want to sign out of your account?"
+        confirmLabel="Sign Out"
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={confirmLogout}
+        onCancel={() => setLogoutModalVisible(false)}
+      />
     </ScrollView>
   );
 }

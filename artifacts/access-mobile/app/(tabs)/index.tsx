@@ -147,40 +147,6 @@ export default function MineScreen() {
         <Text style={styles.balanceCurrency}>ZRN</Text>
       </LinearGradient>
 
-      {/* Supply progress */}
-      <View style={styles.supplyCard}>
-        <View style={styles.supplyRow}>
-          <Text style={styles.supplyLabel}>Total Supply</Text>
-          <Text style={styles.supplyNumbers}>
-            <Text style={styles.supplyMined}>{totalMined.toFixed(2)}</Text>
-            <Text style={styles.supplyTotal}> / 250,000 ZRN</Text>
-          </Text>
-        </View>
-        <View style={styles.progressBg}>
-          <View style={[styles.progressFill, { width: `${supplyPct}%` as any }]} />
-        </View>
-        <Text style={styles.supplyPct}>{supplyPct.toFixed(4)}% mined</Text>
-      </View>
-
-      {/* Session info */}
-      <View style={styles.infoRow}>
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Per Session</Text>
-          <Text style={styles.infoValue}>{ratePerSession.toFixed(4)}</Text>
-          <Text style={styles.infoCurrency}>ZRN</Text>
-        </View>
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Active Refs</Text>
-          <Text style={styles.infoValue}>{status?.activeReferralCount ?? 0}</Text>
-          <Text style={styles.infoCurrency}>+{((status?.activeReferralCount ?? 0) * 0.001).toFixed(3)} ZRN</Text>
-        </View>
-        <View style={styles.infoCard}>
-          <Text style={styles.infoLabel}>Duration</Text>
-          <Text style={[styles.infoValue, { fontSize: 16 }]}>12h</Text>
-          <Text style={styles.infoCurrency}>per session</Text>
-        </View>
-      </View>
-
       {/* Mine ring */}
       <View style={styles.btnArea}>
         <Animated.View style={[styles.btnGlow, { transform: [{ scale: pulseAnim }], opacity: isClaimable ? glowAnim : 0.12 }]} />
@@ -217,13 +183,47 @@ export default function MineScreen() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.hint}>
-        {isClaimable
-          ? 'Session complete — tap CLAIM to collect your ZRN'
-          : isActive
-          ? 'Mining runs on our servers — this keeps counting down even if you close the app or change your clock'
-          : 'Tap MINE to start a new 12-hour session'}
-      </Text>
+      {/* Supply progress */}
+      <View style={styles.supplyCard}>
+        <View style={styles.supplyRow}>
+          <Text style={styles.supplyLabel}>Total Supply</Text>
+          <Text style={styles.supplyNumbers}>
+            <Text style={styles.supplyMined}>{totalMined.toFixed(2)}</Text>
+            <Text style={styles.supplyTotal}> / 250,000 ZRN</Text>
+          </Text>
+        </View>
+        <View style={styles.progressBg}>
+          <View style={[styles.progressFill, { width: `${supplyPct}%` as any }]} />
+        </View>
+        <Text style={styles.supplyPct}>{supplyPct.toFixed(4)}% mined</Text>
+      </View>
+
+      {/* Session info */}
+      <View style={styles.infoRow}>
+        <View style={styles.infoCard}>
+          <Text style={styles.infoLabel}>Per Session</Text>
+          <Text style={styles.infoValue}>{ratePerSession.toFixed(4)}</Text>
+          <Text style={styles.infoCurrency}>ZRN</Text>
+        </View>
+        <View style={styles.infoCard}>
+          <Text style={styles.infoLabel}>Active Refs</Text>
+          <Text style={styles.infoValue}>{status?.activeReferralCount ?? 0}</Text>
+          <Text style={styles.infoCurrency}>+{((status?.activeReferralCount ?? 0) * 0.001).toFixed(3)} ZRN</Text>
+        </View>
+        <View style={styles.infoCard}>
+          <Text style={styles.infoLabel}>Duration</Text>
+          <Text style={[styles.infoValue, { fontSize: 16 }]}>12h</Text>
+          <Text style={styles.infoCurrency}>per session</Text>
+        </View>
+      </View>
+
+      {!isActive || isClaimable ? (
+        <Text style={styles.hint}>
+          {isClaimable
+            ? 'Session complete — tap CLAIM to collect your ZRN'
+            : 'Tap MINE to start a new 12-hour session'}
+        </Text>
+      ) : null}
     </ScrollView>
   );
 }
