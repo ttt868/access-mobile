@@ -48,9 +48,7 @@ export default function LeaderboardScreen() {
   const activeLoading = isMiners ? isLoading : refLoading;
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
-      <Text style={styles.screenTitle}>Leaderboard</Text>
-
+    <View style={[styles.container, { paddingTop: topPad + 12 }]}>
       {/* Supply bar */}
       <View style={styles.supplyBar}>
         <View style={styles.supplyTopRow}>
@@ -149,7 +147,6 @@ function PodiumItem({ entry, colorIdx, size, mode }: { entry: any; colorIdx: num
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
-  screenTitle: { fontSize: 24, fontFamily: 'Inter_700Bold', color: C.foreground, paddingHorizontal: 20, paddingBottom: 12 },
   supplyBar: {
     marginHorizontal: 20, backgroundColor: C.card, borderRadius: 14,
     borderWidth: 1, borderColor: C.border, padding: 14, marginBottom: 14,

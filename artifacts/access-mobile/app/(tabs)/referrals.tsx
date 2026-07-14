@@ -37,9 +37,7 @@ export default function ReferralsScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
-      <Text style={styles.screenTitle}>Referrals</Text>
-
+    <View style={[styles.container, { paddingTop: topPad + 12 }]}>
       <View style={styles.summaryCard}>
         <View style={styles.summaryTop}>
           <View>
@@ -97,7 +95,6 @@ export default function ReferralsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
-  screenTitle: { fontSize: 24, fontFamily: 'Inter_700Bold', color: C.foreground, paddingHorizontal: 20, paddingBottom: 12 },
   summaryCard: {
     marginHorizontal: 20, backgroundColor: C.card, borderRadius: 18,
     borderWidth: 1, borderColor: C.border, padding: 18, marginBottom: 20,

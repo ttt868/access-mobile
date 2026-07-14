@@ -78,8 +78,6 @@ export default function ProfileScreen() {
       style={{ backgroundColor: C.background }}
       contentContainerStyle={{ paddingTop: topPad, paddingHorizontal: 20, paddingBottom: bottomPad }}
     >
-      <Text style={styles.screenTitle}>Account</Text>
-
       {/* Avatar */}
       <View style={styles.avatarSection}>
         <TouchableOpacity onPress={handlePickAvatar} activeOpacity={0.8} disabled={avatarMutation.isPending}>
@@ -192,7 +190,6 @@ function InfoRow({ icon, label, value }: { icon: any; label: string; value: stri
 }
 
 const styles = StyleSheet.create({
-  screenTitle: { fontSize: 24, fontFamily: 'Inter_700Bold', color: C.foreground, paddingBottom: 16 },
   avatarSection: { alignItems: 'center', marginBottom: 20 },
   avatar: {
     width: 76, height: 76, borderRadius: 38,

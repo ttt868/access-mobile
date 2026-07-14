@@ -28,9 +28,7 @@ export default function WalletScreen() {
   const txs = txData?.transactions ?? [];
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
-      <Text style={styles.screenTitle}>Wallet</Text>
-
+    <View style={[styles.container, { paddingTop: topPad + 12 }]}>
       <View style={styles.balanceCard}>
         <View style={styles.balanceRow}>
           <View>
@@ -95,7 +93,6 @@ export default function WalletScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
-  screenTitle: { fontSize: 24, fontFamily: 'Inter_700Bold', color: C.foreground, paddingHorizontal: 20, paddingBottom: 14 },
   balanceCard: {
     marginHorizontal: 20, backgroundColor: C.card, borderRadius: 20,
     borderWidth: 1, borderColor: C.border, padding: 18, marginBottom: 22,
