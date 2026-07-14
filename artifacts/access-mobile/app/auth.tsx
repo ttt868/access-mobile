@@ -80,78 +80,100 @@ export default function AuthScreen() {
   const topPad = insets.top + (Platform.OS === 'web' ? 24 : 8);
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
-      {/* Logo */}
-      <View style={styles.logoArea}>
-        <LinearGradient
-          colors={[C.primary, C.accent]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.logoCircle}
-        >
-          <Feather name="cpu" size={30} color="#080C14" />
-        </LinearGradient>
-        <Text style={styles.appName}>NEXORA</Text>
-        <Text style={styles.tagline}>Global Mining Network</Text>
-        <View style={styles.currencyBadge}>
-          <Text style={styles.currencyBadgeText}>ZRN Token</Text>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          <TouchableOpacity
-            style={[styles.tab, mode === 'login' && styles.tabActive]}
-            onPress={() => { setMode('login'); setError(''); }}
-          >
-            <Text style={[styles.tabText, mode === 'login' && styles.tabTextActive]}>Sign In</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, mode === 'register' && styles.tabActive]}
-            onPress={() => { setMode('register'); setError(''); }}
-          >
-            <Text style={[styles.tabText, mode === 'register' && styles.tabTextActive]}>Create Account</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.fields}>
-          <Field label="Username" value={username} onChangeText={setUsername} placeholder="Enter username" autoCapitalize="none" />
-          <Field label="Password" value={password} onChangeText={setPassword} placeholder="Enter password" secureTextEntry />
-          {mode === 'register' && (
-            <Field
-              label="Referral Code (optional)"
-              value={referralCode}
-              onChangeText={setReferralCode}
-              placeholder="Enter referral code"
-              autoCapitalize="characters"
-            />
-          )}
-
-          {!!error && <Text style={styles.error}>{error}</Text>}
-
-          <TouchableOpacity
-            style={styles.btnWrapper}
-            onPress={handleSubmit}
-            disabled={isLoading}
-            activeOpacity={0.85}
-          >
+    <LinearGradient
+      colors={['#E5EEF9', '#FFFFFF', '#F8FAFC']}
+      locations={[0, 0.4, 1]}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: topPad + 40 }]} keyboardShouldPersistTaps="handled">
+        {/* Logo */}
+        <View style={styles.logoArea}>
+          <View style={styles.logoShadow}>
             <LinearGradient
-              colors={isLoading ? [C.secondary, C.secondary] : [C.primary, C.accent]}
+              colors={['#FFFFFF', '#EAF0F8']}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.btn}
+              end={{ x: 1, y: 1 }}
+              style={styles.logoCircle}
             >
-              {isLoading ? (
-                <ActivityIndicator color={C.primaryForeground} />
-              ) : (
-                <Text style={styles.btnText}>{mode === 'login' ? 'Sign In' : 'Start Mining'}</Text>
-              )}
+              <LinearGradient
+                colors={[C.primary, '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.logoInner}
+              >
+                <Feather name="layers" size={32} color="#FFFFFF" />
+              </LinearGradient>
             </LinearGradient>
-          </TouchableOpacity>
+          </View>
+          <Text style={styles.appName}>NEXORA</Text>
+          <Text style={styles.tagline}>The Premium Mining Network</Text>
+          <View style={styles.currencyBadge}>
+            <Text style={styles.currencyBadgeText}>ZRN Token</Text>
+          </View>
+        </View>
+
+        <View style={styles.formContainer}>
+          {/* Tabs */}
+          <View style={styles.tabs}>
+            <TouchableOpacity
+              style={[styles.tab, mode === 'login' && styles.tabActive]}
+              onPress={() => { setMode('login'); setError(''); }}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.tabText, mode === 'login' && styles.tabTextActive]}>Sign In</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, mode === 'register' && styles.tabActive]}
+              onPress={() => { setMode('register'); setError(''); }}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.tabText, mode === 'register' && styles.tabTextActive]}>Create Account</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.fields}>
+            <Field label="Username" value={username} onChangeText={setUsername} placeholder="Enter username" autoCapitalize="none" />
+            <Field label="Password" value={password} onChangeText={setPassword} placeholder="Enter password" secureTextEntry />
+            {mode === 'register' && (
+              <Field
+                label="Referral Code (optional)"
+                value={referralCode}
+                onChangeText={setReferralCode}
+                placeholder="Enter referral code"
+                autoCapitalize="characters"
+              />
+            )}
+
+            {!!error && (
+              <View style={styles.errorBox}>
+                <Feather name="alert-circle" size={14} color={C.destructive} />
+                <Text style={styles.error}>{error}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={styles.btnWrapper}
+              onPress={handleSubmit}
+              disabled={isLoading}
+              activeOpacity={0.85}
+            >
+              <LinearGradient
+                colors={isLoading ? ['#94A3B8', '#94A3B8'] : [C.primary, C.accent]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.btn}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.btnText}>{mode === 'login' ? 'Sign In' : 'Start Mining'}</Text>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -164,60 +186,95 @@ function Field({
   return (
     <View style={styles.inputWrapper}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={styles.input}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={C.mutedForeground}
-        secureTextEntry={secureTextEntry}
-        autoCapitalize={autoCapitalize ?? 'none'}
-        autoCorrect={false}
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="#94A3B8"
+          secureTextEntry={secureTextEntry}
+          autoCapitalize={autoCapitalize ?? 'none'}
+          autoCorrect={false}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.background },
-  logoArea: { alignItems: 'center', paddingBottom: 24, paddingHorizontal: 24 },
+  container: { flex: 1 },
+  scrollContent: { paddingHorizontal: 24, paddingBottom: 40, flexGrow: 1, alignItems: 'center' },
+  logoArea: { alignItems: 'center', paddingBottom: 32, width: '100%' },
+  logoShadow: {
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 10,
+    marginBottom: 20,
+    borderRadius: 34,
+  },
   logoCircle: {
-    width: 76, height: 76, borderRadius: 22,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 14,
-    shadowColor: C.primary, shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6, shadowRadius: 20, elevation: 10,
+    width: 88, height: 88, borderRadius: 34,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: '#FFFFFF',
+    padding: 6,
   },
-  appName: { fontSize: 28, fontFamily: 'Inter_700Bold', color: C.foreground, letterSpacing: 5 },
-  tagline: { fontSize: 12, fontFamily: 'Inter_400Regular', color: C.mutedForeground, marginTop: 3, letterSpacing: 1 },
+  logoInner: {
+    width: '100%', height: '100%', borderRadius: 28,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  appName: { fontSize: 32, fontFamily: 'Inter_700Bold', color: C.foreground, letterSpacing: 6 },
+  tagline: { fontSize: 13, fontFamily: 'Inter_500Medium', color: '#64748B', marginTop: 4, letterSpacing: 1.5, textTransform: 'uppercase' },
   currencyBadge: {
-    marginTop: 12, backgroundColor: C.primary + '22',
-    borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5,
-    borderWidth: 1, borderColor: C.primary + '44',
+    marginTop: 16, backgroundColor: '#FFFFFF',
+    borderRadius: 20, paddingHorizontal: 16, paddingVertical: 6,
+    shadowColor: C.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 2,
+    borderWidth: 1, borderColor: C.border,
   },
-  currencyBadgeText: { fontSize: 13, color: C.primary, fontFamily: 'Inter_600SemiBold', letterSpacing: 1 },
-  form: { paddingHorizontal: 24, paddingBottom: 32 },
+  currencyBadgeText: { fontSize: 13, color: C.primary, fontFamily: 'Inter_700Bold', letterSpacing: 1 },
+  formContainer: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 32,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.05,
+    shadowRadius: 30,
+    elevation: 5,
+  },
   tabs: {
-    flexDirection: 'row', backgroundColor: C.secondary,
-    borderRadius: 12, padding: 4, marginBottom: 24,
+    flexDirection: 'row', backgroundColor: '#F1F5F9',
+    borderRadius: 16, padding: 6, marginBottom: 28,
   },
-  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: C.primary },
-  tabText: { fontSize: 14, fontFamily: 'Inter_500Medium', color: C.mutedForeground },
-  tabTextActive: { color: C.primaryForeground, fontFamily: 'Inter_600SemiBold' },
-  fields: { gap: 14 },
-  inputWrapper: { gap: 6 },
-  label: { fontSize: 12, fontFamily: 'Inter_500Medium', color: C.mutedForeground, letterSpacing: 0.5 },
+  tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
+  tabActive: { backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  tabText: { fontSize: 14, fontFamily: 'Inter_600SemiBold', color: '#64748B' },
+  tabTextActive: { color: C.primary, fontFamily: 'Inter_700Bold' },
+  fields: { gap: 20 },
+  inputWrapper: { gap: 8 },
+  label: { fontSize: 13, fontFamily: 'Inter_600SemiBold', color: C.foreground, marginLeft: 4 },
+  inputContainer: {
+    backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: C.border,
+    borderRadius: 16, overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.02, shadowRadius: 4, elevation: 1,
+  },
   input: {
-    backgroundColor: C.card, borderWidth: 1, borderColor: C.border,
-    borderRadius: 12, paddingHorizontal: 16, paddingVertical: 13,
-    fontSize: 15, fontFamily: 'Inter_400Regular', color: C.foreground,
+    paddingHorizontal: 18, paddingVertical: 16,
+    fontSize: 15, fontFamily: 'Inter_500Medium', color: C.foreground,
   },
-  error: { fontSize: 13, color: C.destructive, fontFamily: 'Inter_400Regular', textAlign: 'center' },
+  errorBox: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FEF2F2', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: '#FECACA' },
+  error: { fontSize: 13, color: C.destructive, fontFamily: 'Inter_500Medium', flex: 1 },
   btnWrapper: {
-    borderRadius: 14, marginTop: 6,
-    shadowColor: C.primary, shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4, shadowRadius: 12, elevation: 8,
+    borderRadius: 18, marginTop: 8,
+    shadowColor: C.primary, shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25, shadowRadius: 16, elevation: 8,
   },
-  btn: { borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
-  btnText: { fontSize: 16, fontFamily: 'Inter_700Bold', color: C.primaryForeground, letterSpacing: 0.5 },
+  btn: { borderRadius: 18, paddingVertical: 18, alignItems: 'center' },
+  btnText: { fontSize: 16, fontFamily: 'Inter_700Bold', color: '#FFFFFF', letterSpacing: 0.5 },
 });
