@@ -229,7 +229,7 @@ export default function MineScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', paddingHorizontal: 20 },
+  container: { alignItems: 'center', paddingHorizontal: 14 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',

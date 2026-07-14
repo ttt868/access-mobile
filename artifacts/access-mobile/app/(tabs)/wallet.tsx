@@ -28,7 +28,7 @@ export default function WalletScreen() {
   const txs = txData?.transactions ?? [];
 
   return (
-    <View style={[styles.container, { paddingTop: topPad + 12 }]}>
+    <View style={[styles.container, { paddingTop: topPad + 12, paddingHorizontal: 14 }]}>
       <View style={styles.balanceCard}>
         <View style={styles.balanceRow}>
           <View>
@@ -71,7 +71,7 @@ export default function WalletScreen() {
         <FlatList
           data={txs}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80 }}
+          contentContainerStyle={{ paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80 }}
           renderItem={({ item }) => (
             <View style={styles.txRow}>
               <View style={[styles.txIcon, item.type !== 'mine' && styles.txIconRef]}>
@@ -94,7 +94,7 @@ export default function WalletScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   balanceCard: {
-    marginHorizontal: 20, backgroundColor: C.card, borderRadius: 20,
+    backgroundColor: C.card, borderRadius: 20,
     borderWidth: 1, borderColor: C.border, padding: 18, marginBottom: 22,
     shadowColor: C.primary, shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12, shadowRadius: 14, elevation: 5,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   balanceMeta: { alignItems: 'center' },
   metaLabel: { fontSize: 10, color: C.mutedForeground, fontFamily: 'Inter_400Regular', textTransform: 'uppercase', letterSpacing: 0.5 },
   metaValue: { fontSize: 13, color: C.foreground, fontFamily: 'Inter_600SemiBold', marginTop: 2 },
-  sectionTitle: { fontSize: 15, fontFamily: 'Inter_600SemiBold', color: C.foreground, paddingHorizontal: 20, marginBottom: 10 },
+  sectionTitle: { fontSize: 15, fontFamily: 'Inter_600SemiBold', color: C.foreground, marginBottom: 10 },
   empty: { alignItems: 'center', marginTop: 60, gap: 8 },
   emptyText: { fontSize: 15, color: C.mutedForeground, fontFamily: 'Inter_500Medium' },
   emptyHint: { fontSize: 12, color: C.mutedForeground, fontFamily: 'Inter_400Regular' },

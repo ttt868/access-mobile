@@ -48,7 +48,7 @@ export default function LeaderboardScreen() {
   const activeLoading = isMiners ? isLoading : refLoading;
 
   return (
-    <View style={[styles.container, { paddingTop: topPad + 12 }]}>
+    <View style={[styles.container, { paddingTop: topPad + 12, paddingHorizontal: 14 }]}>
       {/* Supply bar */}
       <View style={styles.supplyBar}>
         <View style={styles.supplyTopRow}>
@@ -98,7 +98,7 @@ export default function LeaderboardScreen() {
         <FlatList
           data={activeEntries.slice(3)}
           keyExtractor={(item) => String(item.rank)}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80 }}
+          contentContainerStyle={{ paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80 }}
           renderItem={({ item }) => {
             const isMe = item.username === user?.username;
             return (
@@ -148,7 +148,7 @@ function PodiumItem({ entry, colorIdx, size, mode }: { entry: any; colorIdx: num
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   supplyBar: {
-    marginHorizontal: 20, backgroundColor: C.card, borderRadius: 14,
+    backgroundColor: C.card, borderRadius: 14,
     borderWidth: 1, borderColor: C.border, padding: 14, marginBottom: 14,
   },
   supplyTopRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   progressBg: { height: 5, backgroundColor: C.secondary, borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: 5, backgroundColor: C.primary, borderRadius: 3 },
   tabSwitch: {
-    flexDirection: 'row', marginHorizontal: 20, marginBottom: 14, backgroundColor: C.card,
+    flexDirection: 'row', marginBottom: 14, backgroundColor: C.card,
     borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 4, gap: 4,
   },
   tabBtn: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   tabBtnTextActive: { color: C.background },
   podium: {
     flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end',
-    marginHorizontal: 20, marginBottom: 14, gap: 8,
+    marginBottom: 14, gap: 8,
     backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.border, padding: 16,
   },
   podiumItem: { alignItems: 'center', flex: 1, gap: 4 },

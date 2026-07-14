@@ -37,7 +37,7 @@ export default function ReferralsScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: topPad + 12 }]}>
+    <View style={[styles.container, { paddingTop: topPad + 12, paddingHorizontal: 14 }]}>
       <View style={styles.summaryCard}>
         <View style={styles.summaryTop}>
           <View>
@@ -69,7 +69,7 @@ export default function ReferralsScreen() {
         <FlatList
           data={referrals}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80 }}
+          contentContainerStyle={{ paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 0) + 80 }}
           renderItem={({ item }) => (
             <View style={styles.row}>
               <Avatar avatarUrl={item.avatarUrl} username={item.username} size={40} />
@@ -96,7 +96,7 @@ export default function ReferralsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   summaryCard: {
-    marginHorizontal: 20, backgroundColor: C.card, borderRadius: 18,
+    backgroundColor: C.card, borderRadius: 18,
     borderWidth: 1, borderColor: C.border, padding: 18, marginBottom: 20,
   },
   summaryTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: C.primary, borderRadius: 12, paddingVertical: 12,
   },
   shareBtnText: { fontSize: 14, color: C.primaryForeground, fontFamily: 'Inter_600SemiBold' },
-  sectionTitle: { fontSize: 15, fontFamily: 'Inter_600SemiBold', color: C.foreground, paddingHorizontal: 20, marginBottom: 10 },
+  sectionTitle: { fontSize: 15, fontFamily: 'Inter_600SemiBold', color: C.foreground, marginBottom: 10 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 12 },
   avatarFallback: {
     backgroundColor: C.secondary, borderWidth: 1, borderColor: C.border,

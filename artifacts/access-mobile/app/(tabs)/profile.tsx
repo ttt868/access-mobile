@@ -76,7 +76,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: C.background }}
-      contentContainerStyle={{ paddingTop: topPad, paddingHorizontal: 20, paddingBottom: bottomPad }}
+      contentContainerStyle={{ paddingTop: topPad, paddingHorizontal: 14, paddingBottom: bottomPad }}
     >
       {/* Avatar */}
       <View style={styles.avatarSection}>
