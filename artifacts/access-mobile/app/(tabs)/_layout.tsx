@@ -40,10 +40,14 @@ function ClassicTabLayout() {
   const colors = useColors();
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
+  const isDark = colorScheme === 'dark';
   const isIOS = Platform.OS === 'ios';
   const isWeb = Platform.OS === 'web';
+  // Reserve space for the phone's own home indicator / nav bar (gesture bar on
+  // iOS, back/home/recents buttons on Android) so our tab bar never sits
+  // underneath it. Web has no system chrome to dodge.
   const bottomInset = isWeb ? 0 : insets.bottom;
-  const barContentHeight = 64;
+  const barContentHeight = 56;
 
   return (
     <Tabs
@@ -53,41 +57,24 @@ function ClassicTabLayout() {
         headerShown: false,
         tabBarStyle: {
           position: 'absolute',
-          bottom: bottomInset > 0 ? bottomInset : 20,
-          left: 20,
-          right: 20,
-          backgroundColor: isIOS ? 'transparent' : 'rgba(255, 255, 255, 0.95)',
-          borderTopWidth: 0,
-          borderRadius: 32,
-          elevation: 10,
-          height: barContentHeight,
-          paddingBottom: 0,
-          paddingTop: 0,
-          shadowColor: colors.primary,
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.15,
-          shadowRadius: 20,
-          borderWidth: 1,
-          borderColor: 'rgba(255, 255, 255, 0.5)',
+          backgroundColor: isIOS ? 'transparent' : colors.background,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          elevation: 0,
+          height: barContentHeight + bottomInset + (isWeb ? 28 : 0),
+          paddingBottom: bottomInset,
+          paddingTop: 6,
         },
         tabBarBackground: () =>
           isIOS ? (
             <BlurView
               intensity={80}
-              tint="light"
-              style={[StyleSheet.absoluteFill, { borderRadius: 32, overflow: 'hidden' }]}
+              tint={isDark ? 'dark' : 'dark'}
+              style={StyleSheet.absoluteFill}
             />
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card, borderRadius: 32, opacity: 0.95 }]} />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]} />
           ),
-        tabBarItemStyle: {
-          paddingVertical: 10,
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: 'Inter_500Medium',
-          marginTop: 2,
-        }
       }}
     >
       <Tabs.Screen
@@ -141,7 +128,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: 'Account',
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="person.circle.fill" tintColor={color} size={22} />
