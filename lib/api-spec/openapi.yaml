@@ -200,6 +200,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/LeaderboardResponse"
 
+  /leaderboard/referrers:
+    get:
+      operationId: getTopReferrers
+      tags: [leaderboard]
+      responses:
+        "200":
+          description: Top referrers leaderboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopReferrersResponse"
+
   /transactions:
     get:
       operationId: getTransactions
@@ -367,6 +379,32 @@ components:
         totalSupply:
           type: number
       required: [entries, totalMined, totalSupply]
+
+    TopReferrerEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        referralCount:
+          type: integer
+        referralEarnings:
+          type: number
+          description: Total ZRN collected from referral signup bonuses.
+      required: [rank, username, referralCount, referralEarnings]
+
+    TopReferrersResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopReferrerEntry"
+      required: [entries]
 
     ReferralEntry:
       type: object

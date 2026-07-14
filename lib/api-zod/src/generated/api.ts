@@ -148,6 +148,17 @@ export const GetLeaderboardResponse = zod.object({
 })
 
 
+export const GetTopReferrersResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "rank": zod.number(),
+  "username": zod.string(),
+  "avatarUrl": zod.string().nullish(),
+  "referralCount": zod.number(),
+  "referralEarnings": zod.number().describe('Total ZRN collected from referral signup bonuses.')
+}))
+})
+
+
 export const GetTransactionsResponse = zod.object({
   "transactions": zod.array(zod.object({
   "id": zod.number(),

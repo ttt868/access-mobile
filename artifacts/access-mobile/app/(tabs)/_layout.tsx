@@ -1,5 +1,6 @@
 import React from 'react';
 import { Platform, StyleSheet, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -38,9 +39,15 @@ function NativeTabLayout() {
 function ClassicTabLayout() {
   const colors = useColors();
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === 'dark';
   const isIOS = Platform.OS === 'ios';
   const isWeb = Platform.OS === 'web';
+  // Reserve space for the phone's own home indicator / nav bar (gesture bar on
+  // iOS, back/home/recents buttons on Android) so our tab bar never sits
+  // underneath it. Web has no system chrome to dodge.
+  const bottomInset = isWeb ? 0 : insets.bottom;
+  const barContentHeight = 56;
 
   return (
     <Tabs
@@ -54,7 +61,9 @@ function ClassicTabLayout() {
           borderTopWidth: 1,
           borderTopColor: colors.border,
           elevation: 0,
-          height: isWeb ? 84 : 60,
+          height: barContentHeight + bottomInset + (isWeb ? 28 : 0),
+          paddingBottom: bottomInset,
+          paddingTop: 6,
         },
         tabBarBackground: () =>
           isIOS ? (

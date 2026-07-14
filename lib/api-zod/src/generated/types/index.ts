@@ -17,6 +17,8 @@ export * from './miningStatus';
 export * from './referralEntry';
 export * from './referralsResponse';
 export * from './registerRequest';
+export * from './topReferrerEntry';
+export * from './topReferrersResponse';
 export * from './transaction';
 export * from './transactionsResponse';
 export * from './updateAvatarRequest';

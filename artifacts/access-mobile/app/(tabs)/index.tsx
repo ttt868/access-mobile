@@ -171,7 +171,7 @@ export default function MineScreen() {
           ) : isActive && !isClaimable ? (
             <>
               <Text style={styles.mineBtnTimer}>{formatDuration(displayRemainingMs)}</Text>
-              <Text style={styles.mineBtnSub}>mining · server-timed</Text>
+              <Text style={styles.mineBtnSub}>mining active</Text>
             </>
           ) : (
             <>

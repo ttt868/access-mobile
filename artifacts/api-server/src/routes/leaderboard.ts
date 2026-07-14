@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { desc, sum } from "drizzle-orm";
-import { db, usersTable } from "@workspace/db";
+import { and, desc, eq, sum } from "drizzle-orm";
+import { db, usersTable, transactionsTable } from "@workspace/db";
 
 const router = Router();
 const TOTAL_SUPPLY = 250000;
@@ -31,6 +31,41 @@ router.get("/", async (_req, res) => {
     totalMined: Math.round(totalMined * 1000000) / 1000000,
     totalSupply: TOTAL_SUPPLY,
   });
+});
+
+router.get("/referrers", async (_req, res) => {
+  const users = await db
+    .select({
+      id: usersTable.id,
+      username: usersTable.username,
+      avatarUrl: usersTable.avatarUrl,
+      referralCount: usersTable.referralCount,
+    })
+    .from(usersTable)
+    .orderBy(desc(usersTable.referralCount))
+    .limit(50);
+
+  const withEarnings = await Promise.all(
+    users.map(async (u) => {
+      const [result] = await db
+        .select({ total: sum(transactionsTable.amount) })
+        .from(transactionsTable)
+        .where(and(eq(transactionsTable.userId, u.id), eq(transactionsTable.type, "referral_signup")));
+      return {
+        username: u.username,
+        avatarUrl: u.avatarUrl ?? null,
+        referralCount: u.referralCount,
+        referralEarnings: Math.round((parseFloat(result?.total ?? "0") || 0) * 1000000) / 1000000,
+      };
+    })
+  );
+
+  const ranked = withEarnings
+    .filter((u) => u.referralCount > 0)
+    .sort((a, b) => b.referralCount - a.referralCount || b.referralEarnings - a.referralEarnings)
+    .map((u, i) => ({ rank: i + 1, ...u }));
+
+  res.json({ entries: ranked });
 });
 
 export default router;

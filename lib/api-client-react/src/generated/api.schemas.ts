@@ -84,6 +84,19 @@ export interface LeaderboardResponse {
   totalSupply: number;
 }
 
+export interface TopReferrerEntry {
+  rank: number;
+  username: string;
+  avatarUrl?: string | null;
+  referralCount: number;
+  /** Total ZRN collected from referral signup bonuses. */
+  referralEarnings: number;
+}
+
+export interface TopReferrersResponse {
+  entries: TopReferrerEntry[];
+}
+
 export interface ReferralEntry {
   id: number;
   username: string;

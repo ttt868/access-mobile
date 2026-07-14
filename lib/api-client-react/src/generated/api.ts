@@ -29,6 +29,7 @@ import type {
   MiningStatus,
   ReferralsResponse,
   RegisterRequest,
+  TopReferrersResponse,
   TransactionsResponse,
   UpdateAvatarRequest,
   User
@@ -735,6 +736,77 @@ export function useGetLeaderboard<TData = Awaited<ReturnType<typeof getLeaderboa
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetLeaderboardQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetTopReferrersUrl = () => {
+
+
+
+
+  return `/api/leaderboard/referrers`
+}
+
+export const getTopReferrers = async ( options?: RequestInit): Promise<TopReferrersResponse> => {
+
+  return customFetch<TopReferrersResponse>(getGetTopReferrersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTopReferrersQueryKey = () => {
+    return [
+    `/api/leaderboard/referrers`
+    ] as const;
+    }
+
+
+export const getGetTopReferrersQueryOptions = <TData = Awaited<ReturnType<typeof getTopReferrers>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTopReferrers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTopReferrersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopReferrers>>> = ({ signal }) => getTopReferrers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopReferrers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTopReferrersQueryResult = NonNullable<Awaited<ReturnType<typeof getTopReferrers>>>
+export type GetTopReferrersQueryError = ErrorType<unknown>
+
+
+
+export function useGetTopReferrers<TData = Awaited<ReturnType<typeof getTopReferrers>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTopReferrers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTopReferrersQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
